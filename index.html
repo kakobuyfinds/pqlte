@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <title>OrientDig spreadsheet | CAFANS Product Finds &amp; USD Prices</title>
+  <meta name="description" content="Browse real CAFANS listings in this OrientDig spreadsheet. Filter shoes, clothing and bags, download a CSV, and estimate your total cost before ordering.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="OrientDig spreadsheet | CAFANS Product Finds">
+  <meta property="og:description" content="Compare CAFANS listings, export your shortlist, and check sizing, warehouse QC and shipping costs.">
+  <!-- index.html
+    Search review: returned results included orientdigwithqc.com/spreadsheet/shoes
+    (category filters, prices and QC photo counts), www.orientdigs.com
+    (spreadsheet and QC guidance), and orientdigglobal.com (wholesale).
+    Exact Google first-page positions were not verified. This page combines
+    a searchable CAFANS catalog, CSV export and an editable order cost estimate.
+    Catalog snapshot: https://cafans.com/agents/orientdig/spreadsheet/
+    Google and Bing submission pending. After publishing, set an absolute
+    self-referencing canonical for the final URL. Submit that URL through
+    Google Search Console URL Inspection and Bing Webmaster Tools URL Submission
+    using the verified site property.
+  -->
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4f4e9;
+      --white: #fffef7;
+      --ink: #152b21;
+      --muted: #4d6357;
+      --line: #cbd6c9;
+      --green: #183f30;
+      --lime: #d9f38d;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 1rem/1.6 system-ui, sans-serif; }
+    a { color: inherit; text-underline-offset: .23em; }
+    :focus-visible { outline: 3px solid #256856; outline-offset: 4px; }
+    .wrap { width: min(1100px, calc(100% - 2rem)); margin-inline: auto; }
+    header { border-bottom: 1px solid var(--line); }
+    header .wrap, nav { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem 1.4rem; }
+    header .wrap { justify-content: space-between; padding-block: 1rem; }
+    .brand { font-weight: 850; letter-spacing: .12em; text-decoration: none; }
+    nav a { font-size: .9rem; }
+    .hero {
+      margin-block: 1.25rem 3rem;
+      padding: clamp(2.5rem, 8vw, 7rem) 1rem;
+      text-align: center;
+      color: var(--white);
+      background: radial-gradient(ellipse at bottom right, #396b42, transparent 65%), var(--green);
+      border-radius: 1.5rem;
+    }
+    .hero :focus-visible { outline-color: var(--lime); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2 { font-family: Georgia, serif; font-weight: 500; line-height: 1.04; }
+    h1 { font-size: clamp(2.6rem, 8vw, 6rem); letter-spacing: -.055em; margin-bottom: 1rem; }
+    h2 { font-size: clamp(2rem, 5vw, 3.25rem); letter-spacing: -.035em; margin-bottom: .75rem; }
+    .hero p { max-width: 37rem; margin: 0 auto 1.5rem; }
+    .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; }
+    .button, button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      border-radius: .6rem;
+      border: 1px solid transparent;
+      padding: .65rem 1rem;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .primary { color: var(--ink); background: var(--lime); }
+    .secondary { border-color: #b8c9b8; color: var(--white); }
+    button { background: var(--green); color: var(--white); }
+    button:disabled { opacity: .6; cursor: default; }
+    main section { margin-bottom: 3.5rem; }
+    .muted { color: var(--muted); }
+    .toolbar, .budget-fields { display: flex; flex-wrap: wrap; align-items: end; gap: .8rem; }
+    label { display: grid; gap: .25rem; font-weight: 650; }
+    .toolbar label { flex: 1 1 12rem; }
+    input, select {
+      width: 100%;
+      min-width: 0;
+      min-height: 46px;
+      padding: .55rem .7rem;
+      border: 1px solid #879b90;
+      border-radius: .55rem;
+      font: inherit;
+      color: var(--ink);
+      background: var(--white);
+    }
+    #count { margin-block: .75rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 235px), 1fr)); gap: .85rem; }
+    .card, .panel { background: var(--white); border: 1px solid var(--line); border-radius: .9rem; }
+    .card { display: flex; flex-direction: column; align-items: start; padding: 1.2rem; }
+    .card[hidden] { display: none; }
+    .category { color: var(--muted); font-size: .85rem; margin-bottom: .35rem; }
+    .card h3 { font-size: 1.1rem; line-height: 1.3; margin-bottom: .4rem; }
+    .price { font-weight: 750; margin-bottom: 1rem; }
+    .card a { margin-top: auto; font-weight: 650; }
+    .panel { padding: clamp(1rem, 4vw, 2rem); }
+    .budget-fields label { flex: 1 1 9rem; }
+    output { display: block; margin-top: 1rem; font-size: 1.4rem; font-weight: 800; }
+    ol { padding-left: 1.35rem; }
+    li + li { margin-top: .7rem; }
+    details { border-top: 1px solid var(--line); padding-block: .85rem; }
+    summary { cursor: pointer; font-weight: 700; }
+    details p { margin: .55rem 0 0; }
+    footer { border-top: 1px solid var(--line); padding-block: 1.25rem; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+<link rel="canonical" href="https://kakobuyfinds.github.io/pqlte/">
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <a class="brand" href="https://cafans.com/">CAFANS</a>
+      <nav aria-label="On this page">
+        <a href="#catalog">Catalog</a>
+        <a href="#cost">Cost calculator</a>
+        <a href="#ordering">How to order</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" aria-labelledby="title">
+      <h1 id="title">OrientDig spreadsheet</h1>
+      <p>Find shoes, clothing and bags from the CAFANS catalog. Compare estimated USD prices, export a shortlist and work out your order budget.</p>
+      <div class="actions">
+        <a class="button primary" href="https://cafans.com/">OrientDig spreadsheet</a>
+        <a class="button secondary" href="https://cafans.com/">Buy it now</a>
+      </div>
+    </section>
+
+    <section id="catalog" aria-labelledby="catalog-title">
+      <h2 id="catalog-title">CAFANS product catalog</h2>
+      <p class="muted">Estimated item prices in USD from the <a href="https://cafans.com/agents/orientdig/spreadsheet/">CAFANS OrientDig catalog</a>, checked by CAFANS on November 14, 2026. Confirm the price and availability for your selected variant.</p>
+
+      <div class="toolbar" id="catalog-tools" hidden>
+        <label>Search products
+          <input id="product-search" type="search" placeholder="Name or product ID">
+        </label>
+        <label>Category
+          <select id="product-category">
+            <option value="">All categories</option>
+            <option>Shoes</option>
+            <option>Hoodies &amp; sweaters</option>
+            <option>T-shirts</option>
+            <option>Jackets</option>
+            <option>Bags</option>
+          </select>
+        </label>
+        <button id="export" type="button">Download filtered CSV</button>
+      </div>
+      <p id="count" class="muted" aria-live="polite">6 products</p>
+
+      <div class="grid" id="products">
+        <article class="card" data-id="135681" data-category="Shoes" data-price="41.22">
+          <p class="category">Shoes</p>
+          <h3>Casual Shoes</h3>
+          <p class="price">$41.22 USD</p>
+          <a href="https://cafans.com/goods-135681.html" aria-label="View Casual Shoes on CAFANS">View on CAFANS</a>
+        </article>
+        <article class="card" data-id="136254" data-category="Hoodies &amp; sweaters" data-price="14.84">
+          <p class="category">Hoodies &amp; sweaters</p>
+          <h3>Pony-Detail Sweatshirt</h3>
+          <p class="price">$14.84 USD</p>
+          <a href="https://cafans.com/goods-136254.html" aria-label="View Pony-Detail Sweatshirt on CAFANS">View on CAFANS</a>
+        </article>
+        <article class="card" data-id="137681" data-category="T-shirts" data-price="12.23">
+          <p class="category">T-shirts</p>
+          <h3>Printed Short-Sleeve T-Shirt 3</h3>
+          <p class="price">$12.23 USD</p>
+          <a href="https://cafans.com/goods-137681.html" aria-label="View Printed Short-Sleeve T-Shirt 3 on CAFANS">View on CAFANS</a>
+        </article>
+        <article class="card" data-id="136280" data-category="Jackets" data-price="23.02">
+          <p class="category">Jackets</p>
+          <h3>Jacket ZMR16 Jacket</h3>
+          <p class="price">$23.02 USD</p>
+          <a href="https://cafans.com/goods-136280.html" aria-label="View Jacket ZMR16 Jacket on CAFANS">View on CAFANS</a>
+        </article>
+        <article class="card" data-id="138806" data-category="Jackets" data-price="23.35">
+          <p class="category">Jackets</p>
+          <h3>Embroidered Jacket</h3>
+          <p class="price">$23.35 USD</p>
+          <a href="https://cafans.com/goods-138806.html" aria-label="View Embroidered Jacket on CAFANS">View on CAFANS</a>
+        </article>
+        <article class="card" data-id="136469" data-category="Bags" data-price="72.84">
+          <p class="category">Bags</p>
+          <h3>Lf Bag Collection</h3>
+          <p class="price">$72.84 USD</p>
+          <a href="https://cafans.com/goods-136469.html" aria-label="View Lf Bag Collection on CAFANS">View on CAFANS</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="cost" class="panel" aria-labelledby="cost-title">
+      <h2 id="cost-title">Estimate your total order cost</h2>
+      <p class="muted">Enter all amounts in USD. Use your quote for the destination and packed parcel. Add separately billed insurance, handling or import charges under other fees.</p>
+      <form id="budget" hidden>
+        <div class="budget-fields">
+          <label>Item subtotal
+            <input id="items" type="number" min="0" step="0.01" inputmode="decimal">
+          </label>
+          <label>Domestic shipping
+            <input id="domestic" type="number" min="0" step="0.01" inputmode="decimal">
+          </label>
+          <label>International shipping
+            <input id="international" type="number" min="0" step="0.01" inputmode="decimal">
+          </label>
+          <label>Other fees
+            <input id="fees" type="number" min="0" step="0.01" inputmode="decimal">
+          </label>
+        </div>
+        <output id="total" for="items domestic international fees" aria-live="polite">Enter an amount to estimate your total.</output>
+      </form>
+      <noscript><p>Add the item subtotal, domestic shipping, international shipping and separately billed fees to estimate your total.</p></noscript>
+    </section>
+
+    <section id="ordering" aria-labelledby="ordering-title">
+      <h2 id="ordering-title">How to use the spreadsheet with OrientDig</h2>
+      <ol>
+        <li><strong>Open the original listing.</strong> Start from the CAFANS product detail page. Copy the seller’s listing URL and check whether OrientDig can load it.</li>
+        <li><strong>Check the exact variant.</strong> Match the color and model. For a jacket or hoodie, compare chest width and sleeve length with a garment that fits you. For shoes, confirm whether the size chart uses foot length or insole length.</li>
+        <li><strong>Review warehouse QC if available.</strong> Compare the photos for your specific item with the ordered variant. Check size labels, color and visible damage while an exchange may still be possible.</li>
+        <li><strong>Compare shipping quotes for the same parcel.</strong> Use the same destination, packed dimensions and weight. Check what each quote includes before comparing the totals.</li>
+      </ol>
+    </section>
+
+    <section id="faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">OrientDig spreadsheet FAQ</h2>
+      <details>
+        <summary>Which link should I paste into OrientDig?</summary>
+        <p>Use the original seller listing URL from the CAFANS product detail page. Check that the loaded product and variant match your shortlist.</p>
+      </details>
+      <details>
+        <summary>What does the estimated USD price cover?</summary>
+        <p>It reflects the listed item price in US dollars. Check the current variant price, shipping and applicable fees before budgeting for the full order.</p>
+      </details>
+      <details>
+        <summary>What is included in the CSV?</summary>
+        <p>The CSV contains the currently displayed product IDs, names, categories, estimated USD item prices and CAFANS detail links. Open it in Excel or import it into Google Sheets.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap muted">Independent shopping guide · Product listings sourced from <a href="https://cafans.com/">CAFANS</a></div>
+  </footer>
+
+  <script>
+    const tools = document.getElementById('catalog-tools');
+    const cards = [...document.querySelectorAll('#products .card')];
+    const search = document.getElementById('product-search');
+    const category = document.getElementById('product-category');
+    const count = document.getElementById('count');
+    const exportButton = document.getElementById('export');
+
+    function filterProducts() {
+      const words = search.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      let visible = 0;
+
+      for (const card of cards) {
+        const title = card.querySelector('h3').textContent.toLowerCase();
+        const searchable = `${title} ${card.dataset.id}`;
+        const matchesCategory = !category.value || card.dataset.category === category.value;
+        card.hidden = !matchesCategory || !words.every(word => searchable.includes(word));
+        if (!card.hidden) visible += 1;
+      }
+
+      count.textContent = visible === 0
+        ? 'No products match. Try another search or category.'
+        : `${visible} ${visible === 1 ? 'product' : 'products'}`;
+      exportButton.disabled = visible === 0;
+    }
+
+    function csvCell(value) {
+      const text = String(value);
+      const safeText = /^[\s]*[=+\-@]/.test(text) ? `'${text}` : text;
+      return `"${safeText.replace(/"/g, '""')}"`;
+    }
+
+    function downloadCatalog() {
+      const rows = [['Product ID', 'Product', 'Category', 'Estimated USD', 'CAFANS link']];
+      for (const card of cards.filter(item => !item.hidden)) {
+        rows.push([
+          card.dataset.id,
+          card.querySelector('h3').textContent,
+          card.dataset.category,
+          card.dataset.price,
+          card.querySelector('a').href
+        ]);
+      }
+
+      const csv = rows.map(row => row.map(csvCell).join(',')).join('\r\n');
+      const url = URL.createObjectURL(new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'orientdig-spreadsheet-cafans.csv';
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    search.addEventListener('input', filterProducts);
+    category.addEventListener('change', filterProducts);
+    exportButton.addEventListener('click', downloadCatalog);
+    tools.removeAttribute('hidden');
+    filterProducts();
+
+    const budget = document.getElementById('budget');
+    const amounts = [...budget.querySelectorAll('input')];
+    const total = document.getElementById('total');
+    const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
+    function updateTotal() {
+      if (amounts.some(input => !input.validity.valid)) {
+        total.textContent = 'Enter nonnegative USD amounts with up to two decimal places.';
+        return;
+      }
+      if (amounts.every(input => input.value === '')) {
+        total.textContent = 'Enter an amount to estimate your total.';
+        return;
+      }
+      const cents = amounts.reduce((sum, input) => sum + Math.round(Number(input.value) * 100), 0);
+      total.textContent = Number.isSafeInteger(cents)
+        ? `Estimated total: ${usd.format(cents / 100)} USD`
+        : 'The total is too large to calculate.';
+    }
+
+    budget.addEventListener('input', updateTotal);
+    budget.addEventListener('submit', event => event.preventDefault());
+    budget.hidden = false;
+    updateTotal();
+  </script>
+</body>
+</html>
